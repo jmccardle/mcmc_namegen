@@ -23,7 +23,40 @@ class MarkovState:
             if t >= r:
                 return k
         return '\n'
-            
+
+class MarkovChain:
+    def __init__(self, haltstate='\n', between=''):
+        self.states = {haltstate: None} #Why no state? We need to get an error if we try to transition from the halt state.
+        self.init = MarkovState()
+        self.between = between
+
+    def RandomWalk(self, maxlength=0):
+        state = self.init.transition()
+        output = []
+        while state != self.haltstate:
+            output.append(state)
+            if maxlength > 0 and len(output) >= maxlength:
+            nextstate = self.states[state].transition()
+            state = nextstate
+        return self.between.join(output)
+
+    def AddLink(linkstate, targetstate):
+        if not linkstate in self.states:
+            self.states[linkstate] = MarkovState()
+        if targetstate in self.states[linkstate].transitions:
+            self.states[linkstate].transitions[targetstate] += 1
+        else:
+            self.states[linkstate].transitions[targetstate] = 1
+
+    def AddWord(word):  #Adds each letter pair in the word to the markov chain
+        self.init.increment(word[0])
+        for n in xrange(1, len(word)-1):
+            self.AddLink(word[n], word[n+1])
+        self.AddLink(word[-1], self.haltstate)
+
+    def AddWords(sentence): #Adds each word pair in the sentence to the markov chain
+        pass
+        
 states = {'\n': None}
 init = MarkovState()
 
