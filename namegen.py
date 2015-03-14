@@ -12,14 +12,26 @@ class MarkovState:
         else:
             self.transitions[ch] = 1
     def transition(self):
-        count = sum([self.transitions[key] for key in self.transitions])
-        r = random.randint(0, count)
-        t = 1
-        for k in self.transitions:
-            t += self.transitions[k]
-            if t >= r:
-                return k
-        return '\n'
+        if len(self.transitions) == 0:
+            return None
+        if len(self.transitions) == 1:
+            self.transitions.keys()[0]
+        count = sum([self.transitions[key] for key in self.transitions]) * 1.0
+        r = random.uniform(0, count)
+        t = 0
+        for s in self.transitions:
+            if t + self.transitions[s] > r:
+                return s
+            t += self.transitions[s]
+        #chance of any particular state is (self.transitions[s] / count)
+        
+        #r = random.randint(0, count)
+        #t = 1
+        #for k in self.transitions:
+        #    t += self.transitions[k]
+        #    if t >= r:
+        #        return k
+        #return '\n'
 
 class MarkovChain:
     def __init__(self, haltstate='\n', between=''):
