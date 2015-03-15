@@ -1,0 +1,7 @@
+mcmc_namegen
+
+Create new words or names based on existing bodies of text using the power of the Markov Chain.
+
+My implementation isn't terribly advanced or unique, but I had fun and learned while writing it.
+
+License: MIT
