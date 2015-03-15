@@ -8,17 +8,15 @@
 
 import random
 import sys
+from collections import Counter, defaultdict
 
 class MarkovState:
     def __init__(self):
-        self.transitions = {}
+        self.transitions = Counter()    #allows unknown keys to default to zero; simplifies incrementing.
     def __repr__(self):
         return str(self.transitions)
     def increment(self, ch):
-        if ch in self.transitions:
-            self.transitions[ch] += 1
-        else:
-            self.transitions[ch] = 1
+        self.transitions[ch] += 1
     def transition(self):
         if len(self.transitions) == 0:
             return None
@@ -35,7 +33,8 @@ class MarkovState:
 class MarkovChain:
     def __init__(self, haltstate='\n', between=''):
         self.haltstate = haltstate
-        self.states = {haltstate: None} #Why no state? We need to get an error if we try to transition from the halt state.
+        self.states = defaultdict(MarkovState) #allows unknown keys to default to a blank state; simplifies linking.
+        self.states[haltstate] = None #Why no state? We need to get an error if we try to transition from the halt state.
         self.init = MarkovState()
         self.between = between
 
@@ -51,17 +50,9 @@ class MarkovChain:
         return self.between.join(output)
 
     def AddLink(self, linkstate, targetstate):
-        for s in (linkstate, targetstate):
-            if not s in self.states:
-                self.states[s] = MarkovState()
-        if targetstate in self.states[linkstate].transitions:
-            self.states[linkstate].transitions[targetstate] += 1
-        else:
-            self.states[linkstate].transitions[targetstate] = 1
+        self.states[linkstate].increment(targetstate)
 
     def AddWord(self, word, terminate=False):  #Adds each letter pair in the word to the markov chain
-        if not word[0] in self.states:
-            self.states[word[0]] = MarkovState()
         self.init.increment(word[0])
         for n in xrange(0, len(word)-1):
             self.AddLink(word[n], word[n+1])
